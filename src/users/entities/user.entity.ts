@@ -1,3 +1,6 @@
+import { Order } from 'src/entities/order.entity';
+import { Product } from 'src/entities/product.entity';
+import { Role } from 'src/entities/role.entity';
 import {
   Column,
   CreateDateColumn,
@@ -8,14 +11,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Order } from './order.entity';
-import { Product } from './product.entity';
-import { Role } from './role.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @Column({ unique: true })
   email: string;
@@ -32,14 +32,14 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ default: new Date() })
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column()
-  roleId: string;
+  @Column({ default: 3 })
+  roleId: number;
 
   @ManyToOne(() => Role, (role) => role.users)
   @JoinColumn({ name: 'roleId' })

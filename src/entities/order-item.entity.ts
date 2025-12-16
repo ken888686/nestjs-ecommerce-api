@@ -12,24 +12,24 @@ import { Product } from './product.entity';
 @Entity('order_items')
 @Unique(['orderId', 'productId'])
 export class OrderItem {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @Column()
   quantity: number;
 
   @Column('decimal', { precision: 10, scale: 0 })
-  priceAtPurchase: string;
+  priceAtPurchase: number;
 
   @Column()
-  orderId: string;
+  orderId: number;
 
   @ManyToOne(() => Order, (order) => order.orderItems)
   @JoinColumn({ name: 'orderId' })
   order: Order;
 
   @Column()
-  productId: string;
+  productId: number;
 
   @ManyToOne(() => Product, (product) => product.orderItems)
   @JoinColumn({ name: 'productId' })

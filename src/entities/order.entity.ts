@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,15 +11,14 @@ import {
 } from 'typeorm';
 import { OrderItem } from './order-item.entity';
 import { OrderStatus } from './order-status.enum';
-import { User } from './user.entity';
 
 @Entity('orders')
 export class Order {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @Column('decimal', { precision: 10, scale: 2 })
-  totalAmount: string;
+  totalAmount: number;
 
   @Column({
     type: 'enum',
@@ -37,7 +37,7 @@ export class Order {
   updatedAt: Date;
 
   @Column()
-  userId: string;
+  userId: number;
 
   @ManyToOne(() => User, (user) => user.orders)
   @JoinColumn({ name: 'userId' })

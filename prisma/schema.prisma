@@ -15,7 +15,7 @@ datasource db {
 }
 
 model Role {
-  id   String @id @default(uuid())
+  id   BigInt @id @default(autoincrement())
   name String @unique // Admin, Seller, Customer
 
   users User[]
@@ -24,16 +24,16 @@ model Role {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
+  id           BigInt    @id @default(autoincrement())
+  email        String    @unique
   passwordHash String
   firstName    String?
   lastName     String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt
 
-  roleId String
+  roleId BigInt
   role   Role   @relation(fields: [roleId], references: [id])
 
   products Product[]
@@ -43,7 +43,7 @@ model User {
 }
 
 model Category {
-  id       String    @id @default(uuid())
+  id       BigInt    @id @default(autoincrement())
   name     String    @unique
   products Product[]
 
@@ -51,20 +51,20 @@ model Category {
 }
 
 model Product {
-  id            String   @id @default(uuid())
+  id            BigInt    @id @default(autoincrement())
   name          String
-  slug          String   @unique
+  slug          String    @unique
   description   String?
-  price         Decimal  @db.Decimal(10, 0)
+  price         Decimal   @db.Decimal(10, 0)
   stockQuantity Int
-  isPublished   Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  isPublished   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime? @updatedAt
 
-  sellerId String
+  sellerId BigInt
   seller   User   @relation(fields: [sellerId], references: [id])
 
-  categoryId String
+  categoryId BigInt
   category   Category @relation(fields: [categoryId], references: [id])
 
   orderItems OrderItem[]
@@ -81,14 +81,14 @@ enum OrderStatus {
 }
 
 model Order {
-  id              String      @id @default(uuid())
+  id              BigInt      @id @default(autoincrement())
   totalAmount     Decimal     @db.Decimal(10, 2)
   status          OrderStatus @default(PENDING)
   shippingAddress String
   createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  updatedAt       DateTime?   @updatedAt
 
-  userId String
+  userId BigInt
   user   User   @relation(fields: [userId], references: [id])
 
   orderItems OrderItem[]
@@ -97,14 +97,14 @@ model Order {
 }
 
 model OrderItem {
-  id              String  @id @default(uuid())
+  id              BigInt  @id @default(autoincrement())
   quantity        Int
   priceAtPurchase Decimal @db.Decimal(10, 0)
 
-  orderId String
+  orderId BigInt
   order   Order  @relation(fields: [orderId], references: [id])
 
-  productId String
+  productId BigInt
   product   Product @relation(fields: [productId], references: [id])
 
   @@unique([orderId, productId])

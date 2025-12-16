@@ -1,3 +1,4 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,12 +11,11 @@ import {
 } from 'typeorm';
 import { Category } from './category.entity';
 import { OrderItem } from './order-item.entity';
-import { User } from './user.entity';
 
 @Entity('products')
 export class Product {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn('increment')
+  id: number;
 
   @Column()
   name: string;
@@ -35,21 +35,21 @@ export class Product {
   @Column({ default: false })
   isPublished: boolean;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ default: new Date() })
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
 
   @Column()
-  sellerId: string;
+  sellerId: number;
 
   @ManyToOne(() => User, (user) => user.products)
   @JoinColumn({ name: 'sellerId' })
   seller: User;
 
   @Column()
-  categoryId: string;
+  categoryId: number;
 
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'categoryId' })

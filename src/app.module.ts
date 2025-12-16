@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { HealthModule } from './health/health.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env'],
     }),
     HealthModule,
     TypeOrmModule.forRootAsync({
@@ -27,12 +25,13 @@ import { HealthModule } from './health/health.module';
 
         logging: configService.get('NODE_ENV') !== 'production',
 
-        autoLoadEntities: true,
+        entities: [__dirname + '/**/*.entity.{js,ts}'],
       }),
       inject: [ConfigService],
     }),
+    UsersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
