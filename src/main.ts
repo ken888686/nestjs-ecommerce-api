@@ -1,10 +1,6 @@
-import { RequestMethod, ValidationPipe } from '@nestjs/common';
+import { RequestMethod, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import {
-  DocumentBuilder,
-  SwaggerDocumentOptions,
-  SwaggerModule,
-} from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -17,19 +13,22 @@ async function bootstrap() {
   });
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
-  const config = new DocumentBuilder()
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+    prefix: 'v',
+  });
+
+  // Create base document with all routes
+  const baseOptions = new DocumentBuilder()
     .setTitle('Nestjs E-commerce API')
     .setDescription('This is the Nestjs E-commerce API')
     .setVersion('1.0')
     .build();
-  const options: SwaggerDocumentOptions = {
-    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
-  };
-  const documentFactory = () =>
-    SwaggerModule.createDocument(app, config, options);
+  const baseDocument = SwaggerModule.createDocument(app, baseOptions);
 
-  SwaggerModule.setup('swagger', app, documentFactory, {
-    jsonDocumentUrl: 'swagger/json',
+  SwaggerModule.setup('swagger', app, baseDocument, {
+    jsonDocumentUrl: '/v1/swagger/json',
   });
 
   await app.listen(process.env.PORT ?? 3000);
