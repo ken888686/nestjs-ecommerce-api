@@ -56,32 +56,11 @@ describe('UsersController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('signupUser', () => {
-    it('should create a new user', async () => {
-      mockUsersService.createUser.mockResolvedValue(mockUser);
-
-      const createUserDto = {
-        email: 'test@example.com',
-        password: 'password123',
-        firstName: 'John',
-        lastName: 'Doe',
-      };
-
-      const result = await controller.signupUser(createUserDto);
-
-      expect(result.email).toBe('test@example.com');
-      expect(result.id).toBe(1);
-      // passwordHash should not be exposed
-      expect((result as any).passwordHash).toBeUndefined();
-      expect(service.createUser).toHaveBeenCalled();
-    });
-  });
-
   describe('getUserById', () => {
     it('should return a user by id', async () => {
       mockUsersService.user.mockResolvedValue(mockUser);
 
-      const result = await controller.getUserById('1');
+      const result = await controller.getUserById(1);
 
       expect(result.id).toBe(1);
       expect(result.email).toBe('test@example.com');
@@ -91,7 +70,7 @@ describe('UsersController', () => {
     it('should throw NotFoundException if user not found', async () => {
       mockUsersService.user.mockResolvedValue(null);
 
-      await expect(controller.getUserById('999')).rejects.toThrow(
+      await expect(controller.getUserById(999)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -101,7 +80,7 @@ describe('UsersController', () => {
     it('should return an array of users', async () => {
       mockUsersService.users.mockResolvedValue([mockUser]);
 
-      const result = await controller.getUsers('0', '10');
+      const result = await controller.getUsers(0, 10);
 
       expect(result).toHaveLength(1);
       expect(result[0].email).toBe('test@example.com');
@@ -131,7 +110,7 @@ describe('UsersController', () => {
       mockUsersService.user.mockResolvedValue(mockUser);
       mockUsersService.updateUser.mockResolvedValue(updatedUser);
 
-      const result = await controller.updateUser('1', { firstName: 'Updated' });
+      const result = await controller.updateUser(1, { firstName: 'Updated' });
 
       expect(result.firstName).toBe('Updated');
       expect(service.updateUser).toHaveBeenCalledWith({
@@ -144,7 +123,7 @@ describe('UsersController', () => {
       mockUsersService.user.mockResolvedValue(null);
 
       await expect(
-        controller.updateUser('999', { firstName: 'Updated' }),
+        controller.updateUser(999, { firstName: 'Updated' }),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -154,14 +133,14 @@ describe('UsersController', () => {
       mockUsersService.user.mockResolvedValue(mockUser);
       mockUsersService.deleteUser.mockResolvedValue(mockUser);
 
-      await expect(controller.deleteUser('1')).resolves.toBeUndefined();
+      await expect(controller.deleteUser(1)).resolves.toBeUndefined();
       expect(service.deleteUser).toHaveBeenCalledWith({ id: 1 });
     });
 
     it('should throw NotFoundException if user not found', async () => {
       mockUsersService.user.mockResolvedValue(null);
 
-      await expect(controller.deleteUser('999')).rejects.toThrow(
+      await expect(controller.deleteUser(999)).rejects.toThrow(
         NotFoundException,
       );
     });

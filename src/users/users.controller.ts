@@ -21,7 +21,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth';
+import { JwtAuthGuard } from '../auth';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UsersService } from './users.service';
@@ -59,8 +59,8 @@ export class UsersController {
     @Query('take') take?: number,
   ): Promise<UserResponseDto[]> {
     const users = await this.userService.users({
-      skip: skip ? Number(skip) : undefined,
-      take: take ? Number(take) : undefined,
+      skip: skip !== undefined ? +skip : undefined,
+      take: take !== undefined ? +take : undefined,
       orderBy: { createdAt: 'desc' },
     });
 
