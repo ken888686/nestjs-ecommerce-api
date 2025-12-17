@@ -3,6 +3,10 @@ import { Exclude, Expose } from 'class-transformer';
 
 @Exclude()
 export class UserResponseDto {
+  constructor(partial: Partial<UserResponseDto>) {
+    Object.assign(this, partial);
+  }
+
   @ApiProperty({ example: 1 })
   @Expose()
   id: number;
@@ -13,11 +17,11 @@ export class UserResponseDto {
 
   @ApiPropertyOptional({ example: 'Jesus' })
   @Expose()
-  firstName?: string;
+  firstName?: string | null;
 
   @ApiPropertyOptional({ example: 'Christ' })
   @Expose()
-  lastName?: string;
+  lastName?: string | null;
 
   @ApiProperty({ example: true })
   @Expose()
@@ -29,7 +33,7 @@ export class UserResponseDto {
 
   @ApiPropertyOptional({ example: '2025-01-01T00:00:00.000Z' })
   @Expose()
-  updatedAt?: Date;
+  updatedAt?: Date | null;
 
   @ApiProperty({ example: 3 })
   @Expose()

@@ -1,5 +1,10 @@
-import { RequestMethod, ValidationPipe, VersioningType } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import {
+  ClassSerializerInterceptor,
+  RequestMethod,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
@@ -11,7 +16,8 @@ async function bootstrap() {
   app.setGlobalPrefix('api', {
     exclude: [{ path: 'health', method: RequestMethod.GET }],
   });
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -24,6 +30,7 @@ async function bootstrap() {
     .setTitle('Nestjs E-commerce API')
     .setDescription('This is the Nestjs E-commerce API')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const baseDocument = SwaggerModule.createDocument(app, baseOptions);
 
