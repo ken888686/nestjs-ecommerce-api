@@ -1,64 +1,114 @@
-# nestjs-ecommerce-api
+# NestJS E-commerce API
 
-## Description
+An e-commerce backend API project built with the NestJS framework, using TypeScript, Prisma ORM, and PostgreSQL.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Features
 
-## Project setup
+- **Framework**: Built on [NestJS](https://github.com/nestjs/nest) (Node.js framework)
+- **Database**: PostgreSQL with [Prisma ORM](https://www.prisma.io/)
+- **Authentication**:
+  - JWT (JSON Web Token) authentication
+  - Passport.js integration
+  - Password hashing (bcrypt)
+- **API Documentation**:
+  - Swagger UI integration
+  - Multi-version API documentation (V1, V2)
+  - JWT Bearer Auth support
+- **API Versioning**: URI Versioning support (`/api/v1/...`)
+- **Validation**: Data validation using `class-validator` and Pipes
+- **Testing**: Comprehensive Jest unit tests (`.spec.ts`)
+
+## Tech Stack
+
+- **NestJS**: Backend framework
+- **Prisma**: ORM and database migrations
+- **PostgreSQL**: Relational database
+- **Passport / JWT**: Authentication
+- **Swagger**: API Documentation
+- **Jest**: Testing framework
+- **Docker**: (Optional) Containerization
+
+## Installation & Running
+
+### 1. Install Dependencies
 
 ```bash
 npm install
 ```
 
-## Compile and run the project
+### 2. Environment Configuration
+
+Create a `.env` file:
+
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/db_name?schema=public"
+JWT_SECRET="your-super-secret-key"
+JWT_EXPIRES_IN=86400 # 1 day
+```
+
+### 3. Database Migration
+
+Ensure PostgreSQL is running, then execute Prisma migration:
 
 ```bash
-# development
-$ npm run start
+# Push schema to development database
+npx prisma db push
 
-# watch mode
-$ npm run start:dev
+# (Optional) Generate Prisma Client
+npx prisma generate
+```
+
+### 4. Start the Application
+
+```bash
+# development watch mode
+npm run start:dev
 
 # production mode
-$ npm run start:prod
+npm run start:prod
 ```
 
-## Run tests
+The API runs at `http://localhost:3000` by default.
+
+## API Documentation (Swagger)
+
+Once the application is running, visit the following URLs in your browser to view the Swagger documentation:
+
+- **Main Dashboard**: `http://localhost:3000/swagger`
+- **V1 Documentation**: `http://localhost:3000/v1/swagger`
+
+### Authentication Flow
+
+1. Register a new account using `/api/auth/signup`
+2. Login using `/api/auth/login` to obtain an `accessToken`
+3. Click `Authorize` in the top right corner of Swagger UI and enter the token
+4. Access protected APIs (e.g., `/api/v1/users`)
+
+## Testing
+
+The project includes comprehensive unit tests.
 
 ```bash
-# unit tests
-$ npm run test
+# Run all tests
+npm run test
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Run test coverage report
+npm run test:cov
 ```
 
-## Resources
+## Project Structure
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```tree
+src/
+├── app.module.ts       # Root module
+├── main.ts             # Application entry point (Swagger, Versioning, Pipes config)
+├── auth/               # Authentication module (Login, Register, JWT, Guards)
+├── users/              # Users module (CRUD)
+├── prisma/             # Prisma module (DB connection)
+├── health/             # Health check module
+└── common/             # Shared resources (DTOs, Interceptors etc.)
+```
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+[MIT licensed](LICENSE)
