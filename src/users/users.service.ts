@@ -1,60 +1,76 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
-import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { ConflictException, Injectable } from '@nestjs/common';
+import { Prisma, User } from '../generated/prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(createUserDto.password, salt);
+  async user(
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+  ): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: userWhereUniqueInput,
+      include: { role: true },
+    });
+  }
 
-    const user = this.usersRepository.create({
-      ...createUserDto,
-      passwordHash,
+  async userByEmail(email: string): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { email },
+      include: { role: true },
+    });
+  }
+
+  async users(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.user.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+      include: { role: true },
+    });
+  }
+
+  async createUser(data: Prisma.UserCreateInput): Promise<User> {
+    // Check for duplicate email
+    const existing = await this.prisma.user.findUnique({
+      where: { email: data.email },
     });
 
-    return this.usersRepository.save(user);
-  }
-
-  findAll() {
-    return this.usersRepository.find();
-  }
-
-  async findOne(id: number) {
-    const user = await this.usersRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    return user;
-  }
-
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.findOne(id);
-
-    if (updateUserDto.password) {
-      const salt = await bcrypt.genSalt();
-      user.passwordHash = await bcrypt.hash(updateUserDto.password, salt);
+    if (existing) {
+      throw new ConflictException(`Email ${data.email} already exists`);
     }
 
-    if (updateUserDto.email) user.email = updateUserDto.email;
-    if (updateUserDto.firstName) user.firstName = updateUserDto.firstName;
-    if (updateUserDto.lastName) user.lastName = updateUserDto.lastName;
-    if (updateUserDto.roleId) user.roleId = updateUserDto.roleId;
-
-    return this.usersRepository.save(user);
+    return this.prisma.user.create({
+      data,
+      include: { role: true },
+    });
   }
 
-  async remove(id: number) {
-    const user = await this.findOne(id);
-    return this.usersRepository.remove(user);
+  async updateUser(params: {
+    where: Prisma.UserWhereUniqueInput;
+    data: Prisma.UserUpdateInput;
+  }): Promise<User> {
+    const { where, data } = params;
+    return this.prisma.user.update({
+      data,
+      where,
+      include: { role: true },
+    });
+  }
+
+  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
+    return this.prisma.user.delete({
+      where,
+    });
   }
 }
